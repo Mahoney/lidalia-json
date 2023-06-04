@@ -8,24 +8,28 @@ fun JsonObject.obj(key: String) = get(key) as JsonObject
 fun JsonObject.array(key: String) = get(key) as List<JsonObject>
 fun JsonObject.string(key: String) = get(key) as String
 
-fun JsonObject.date() = ReadOnlyProperty<Any, LocalDate> { _, prop ->
-    LocalDate.parse(string(prop.name))
+private fun <T> readOnlyProperty(
+    f: (propName: String) -> T
+) = ReadOnlyProperty<Any, T> { _, prop -> f(prop.name) }
+
+fun JsonObject.date() = readOnlyProperty { prop ->
+    LocalDate.parse(string(prop))
 }
 
-fun JsonObject.uuid() = ReadOnlyProperty<Any, UUID> { _, prop ->
-    UUID.fromString(string(prop.name))
+fun JsonObject.uuid() = readOnlyProperty { prop ->
+    UUID.fromString(string(prop))
 }
 
 fun <T> JsonObject.obj(
     mapper: (JsonObject) -> T
-) = ReadOnlyProperty<Any, T> { _, prop ->
-    mapper(obj(prop.name))
+) = readOnlyProperty { prop ->
+    mapper(obj(prop))
 }
 
 fun <T> JsonObject.array(
     mapper: (JsonObject) -> T
-) = ReadOnlyProperty<Any, List<T>> { _, prop ->
-    array(prop.name).map(mapper)
+) = readOnlyProperty { prop ->
+    array(prop).map(mapper)
 }
 
 abstract class JsonWrapper(val json: JsonObject) {
