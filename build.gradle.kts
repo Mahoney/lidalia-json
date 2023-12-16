@@ -6,11 +6,11 @@ import com.github.gundy.semver4j.model.Version
 plugins {
   kotlin("jvm") version "1.9.21"
 
-  id("com.autonomousapps.dependency-analysis") version "1.28.0"
-  id("org.jmailen.kotlinter") version "4.1.0"
-  id("com.dorongold.task-tree") version "2.1.1"
-  id("com.github.ben-manes.versions") version "0.50.0"
-  id("net.idlestate.gradle-duplicate-classes-check") version "1.2.0"
+  alias(libs.plugins.dependencyAnalysis)
+  alias(libs.plugins.kotlinter)
+  alias(libs.plugins.taskTree)
+  alias(libs.plugins.versions)
+  alias(libs.plugins.duplicateClasses)
 }
 
 buildscript {
@@ -41,7 +41,7 @@ testing {
   suites {
     @Suppress("UnstableApiUsage")
     val test by getting(JvmTestSuite::class) {
-      useJUnitJupiter("5.9.3")
+      useJUnitJupiter()
     }
   }
 }
@@ -103,7 +103,7 @@ fun String.isPreRelease(): Boolean = try {
   false
 }
 
-fun Configuration.isDeprecated() = this is DeprecatableConfiguration
+fun Configuration.isDeprecated() = this is DeprecatableConfiguration && this.isDeprecatedForResolution
 
 fun ConfigurationContainer.resolveAll() = this
   .filter { it.isCanBeResolved && !it.isDeprecated() }
