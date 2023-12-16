@@ -1,10 +1,10 @@
 package json
 
-import io.mocklab.host.either.Outcome
-import io.mocklab.host.either.failure
-import io.mocklab.host.either.map
-import io.mocklab.host.either.orThrow
-import io.mocklab.host.either.success
+import either.Outcome
+import either.failure
+import either.map
+import either.orThrow
+import either.success
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty0
 

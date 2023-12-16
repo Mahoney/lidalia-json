@@ -1,6 +1,6 @@
 package json
 
-import io.mocklab.host.either.Outcome
+import either.Outcome
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.properties.ReadOnlyProperty
