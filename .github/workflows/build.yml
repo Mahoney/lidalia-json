@@ -9,6 +9,10 @@ on:
     # * is a special character in YAML so you have to quote this string
     - cron: '0 2 * * *'
 
+permissions:
+  checks: write
+  pull-requests: write
+
 env:
   BUILDKIT_PROGRESS: plain
   PROGRESS_NO_TRUNC: 1
