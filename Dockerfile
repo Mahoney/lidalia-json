@@ -3,7 +3,7 @@ ARG username=worker
 ARG work_dir=/home/$username/work
 ARG gid=1000
 ARG uid=1001
-ARG gradle_cache_dir=/home/$username/.gradle/caches
+ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
 
 # Copy across all the *.gradle.kts files in a separate stage
 # This will not get any layer caching if anything in the context has changed, but when we
@@ -32,6 +32,7 @@ RUN addgroup --system $username --gid $gid && \
 
 USER $username
 RUN mkdir -p $work_dir
+RUN mkdir -p /home/$username/.gradle/caches
 WORKDIR $work_dir
 
 # Download gradle in a separate step to benefit from layer caching
