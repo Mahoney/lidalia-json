@@ -33,6 +33,13 @@ kotlin {
   jvmToolchain(17)
 }
 
+dependencies {
+  testImplementation(platform(libs.kotest.bom))
+  testImplementation(libs.kotest.runner.junit5)
+  testImplementation(libs.kotest.framework.api)
+  testImplementation(libs.kotest.assertions.shared)
+}
+
 dependencyLocking {
   lockAllConfigurations()
 }
