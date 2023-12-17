@@ -1,4 +1,3 @@
-import org.gradle.internal.deprecation.DeprecatableConfiguration
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gundy.semver4j.model.Version
 
@@ -90,18 +89,4 @@ fun String.isPreRelease(): Boolean = try {
   Version.fromString(this).preReleaseIdentifiers.isNotEmpty()
 } catch (e: IllegalArgumentException) {
   false
-}
-
-fun Configuration.isDeprecated() = this is DeprecatableConfiguration && this.isDeprecatedForResolution
-
-fun ConfigurationContainer.resolveAll() = this
-  .filter { it.isCanBeResolved && !it.isDeprecated() }
-  .map { it.incoming.artifactView { isLenient = true } }
-  .forEach { it.files.files }
-
-tasks.register("downloadDependencies") {
-  doLast {
-    configurations.resolveAll()
-    buildscript.configurations.resolveAll()
-  }
 }
