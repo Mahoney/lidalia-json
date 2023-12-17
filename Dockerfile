@@ -2,13 +2,28 @@
 ARG username=worker
 ARG work_dir=/home/$username/work
 
+# Copy across all the *.gradle.kts files in a separate stage
+# This will not get any layer caching if anything in the context has changed, but when we
+# subsequently copy them into a different stage that stage *will* get layer caching. So if none of
+# the *.gradle.kts files have changed, a subsequent command will also get layer caching.
+FROM alpine as gradle-files
+RUN --mount=type=bind,target=/docker-context \
+    mkdir -p /gradle-files/gradle && \
+    cd /docker-context/ && \
+    find . -name "*.gradle" -exec cp --parents "{}" /gradle-files/ \; && \
+    find . -name "*.gradle.kts" -exec cp --parents "{}" /gradle-files/ \; && \
+    find . -name "libs.versions.toml" -exec cp --parents "{}" /gradle-files/ \; && \
+    find . -name ".editorconfig" -exec cp --parents "{}" /gradle-files/ \; && \
+    find . -name "*module-info.java" -exec cp --parents "{}" /gradle-files/ \;
+
+
 FROM eclipse-temurin:17.0.1_12-jdk-focal as base_builder
 
 ARG username
 ARG work_dir
 ARG gid=1000
 ARG uid=1001
-ARG gradle_cache_dir=/home/$username/.gradle/caches
+ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
 ARG dot_gradle_dir=/home/$username/work/.gradle
 
 RUN addgroup --system $username --gid $gid && \
@@ -35,18 +50,18 @@ ENV GRADLE_OPTS="\
 -Dorg.gradle.console=plain \
 "
 
-COPY --link --chown=$username . .
-
-# Do check with network to resolve all dependencies
+COPY --link --chown=$username --from=gradle-files /gradle-files ./
 RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
-    ./gradlew check -x test
+    ./gradlew build --dry-run
+
+COPY --link --chown=$username . .
 
 # So the tests can run without network access. Proves no tests rely on external services.
 RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     --network=none \
-    ./gradlew --offline check || mkdir -p build
+    ./gradlew --offline build || (mkdir -p build && touch build/failed)
 
 
 FROM scratch as build-output
@@ -64,7 +79,7 @@ FROM base_builder as builder
 RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     --network=none \
-    ./gradlew --offline build
+    if [ -f build/failed ]; then ./gradlew --offline build; fi
 
 
 FROM scratch as jars
