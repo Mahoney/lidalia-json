@@ -13,14 +13,14 @@ class JsonSpec : StringSpec({
         "pet" to mapOf(
           "id" to "ba6e5573-06c0-4dd7-99ca-ef481fc2f870".json(),
           "name" to "Scamper".json(),
-          "dateOfBirth" to "2018-04-25".json(),
+          "dateOfBirth" to "2018-04-26".json(),
         ).json(),
       ).json(),
     )
 
     aPet.pet.id shouldBe UUID.fromString("ba6e5573-06c0-4dd7-99ca-ef481fc2f870")
     aPet.pet.name shouldBe "Scamper"
-    aPet.pet.dateOfBirth shouldBe LocalDate.of(2018, 4, 25)
+    aPet.pet.dateOfBirth shouldBe LocalDate.of(2018, 4, 26)
   }
 
   "parses json to list of objects" {
