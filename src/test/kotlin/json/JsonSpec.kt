@@ -13,7 +13,7 @@ class JsonSpec : StringSpec({
         "pet" to mapOf(
           "id" to "ba6e5573-06c0-4dd7-99ca-ef481fc2f870".json(),
           "name" to "Scamper".json(),
-          "dateOfBirth" to "2018-04-26".json(),
+          "dateOfBirth" to "2013-04-26".json(),
         ).json(),
       ).json(),
     )
