@@ -1,17 +1,15 @@
 # syntax=docker/dockerfile:1.4.0
 ARG username=worker
 ARG work_dir=/home/$username/work
-ARG gid=1000
-ARG uid=1001
-ARG gradle_cache_dir=/home/$username/.gradle/caches
 
 FROM eclipse-temurin:17.0.1_12-jdk-focal as base_builder
 
 ARG username
 ARG work_dir
-ARG gid
-ARG uid
-ARG gradle_cache_dir
+ARG gid=1000
+ARG uid=1001
+ARG gradle_cache_dir=/home/$username/.gradle/caches
+ARG dot_gradle_dir=/home/$username/work/.gradle
 
 RUN addgroup --system $username --gid $gid && \
     adduser --system $username --ingroup $username --uid $uid
@@ -26,7 +24,8 @@ COPY --link --chown=$username gradle/wrapper gradle/wrapper
 COPY --link --chown=$username gradlew gradlew
 COPY --link --chown=$username gradle.properties gradle.properties
 
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
+    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     ./gradlew --version
 
 ENV GRADLE_OPTS="\
@@ -39,11 +38,13 @@ ENV GRADLE_OPTS="\
 COPY --link --chown=$username . .
 
 # Do check with network to resolve all dependencies
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
+    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     ./gradlew check -x test
 
 # So the tests can run without network access. Proves no tests rely on external services.
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
+    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     --network=none \
     ./gradlew --offline check || mkdir -p build
 
@@ -60,7 +61,8 @@ COPY --link --from=base_builder $work_dir/build .
 # to retrieve the build reports whether or not the previous line exited successfully.
 # Workaround for https://github.com/moby/buildkit/issues/1421
 FROM base_builder as builder
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
+    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     --network=none \
     ./gradlew --offline build
 
