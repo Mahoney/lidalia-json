@@ -3,7 +3,6 @@ ARG username=worker
 ARG work_dir=/home/$username/work
 ARG gid=1000
 ARG uid=1001
-ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
 
 # Copy across all the *.gradle.kts files in a separate stage
 # This will not get any layer caching if anything in the context has changed, but when we
@@ -25,7 +24,6 @@ ARG username
 ARG work_dir
 ARG gid
 ARG uid
-ARG gradle_cache_dir
 
 RUN addgroup --system $username --gid $gid && \
     adduser --system $username --ingroup $username --uid $uid
@@ -39,7 +37,12 @@ WORKDIR $work_dir
 COPY --link --chown=$username gradle/wrapper gradle/wrapper
 COPY --link --chown=$username gradlew gradlew
 COPY --link --chown=$username gradle.properties gradle.properties
-RUN ./gradlew --version
+RUN echo "/home/worker/.gradle/caches/build-cache-1"
+RUN echo "/home/worker/.gradle/caches/8.5"
+RUN ls -lA .
+RUN --mount=type=cache,target=/home/worker/.gradle/caches/build-cache-1,gid=$gid,uid=$uid \
+    --mount=type=cache,target=/home/worker/.gradle/caches/8.5,gid=$gid,uid=$uid \
+    ./gradlew --version
 
 ENV GRADLE_OPTS="\
 -Dorg.gradle.daemon=false \
@@ -50,19 +53,20 @@ ENV GRADLE_OPTS="\
 
 # Do all the downloading in one step...
 COPY --link --chown=$username --from=gradle-files /gradle-files ./
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=/home/worker/.gradle/caches/build-cache-1,gid=$gid,uid=$uid \
+    --mount=type=cache,target=/home/worker/.gradle/caches/8.5,gid=$gid,uid=$uid \
     ./gradlew downloadDependencies
 
 COPY --link --chown=$username . .
 
 
 FROM base_builder as checker
-ARG gradle_cache_dir
 ARG gid
 ARG uid
 
 # So the actual build can run without network access. Proves no tests rely on external services.
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=/home/worker/.gradle/caches/build-cache-1,gid=$gid,uid=$uid \
+    --mount=type=cache,target=/home/worker/.gradle/caches/8.5,gid=$gid,uid=$uid \
     --network=none \
     ./gradlew --offline check || mkdir -p build
 
@@ -79,7 +83,8 @@ COPY --link --from=checker $work_dir/build .
 # to retrieve the build reports whether or not the previous line exited successfully.
 # Workaround for https://github.com/moby/buildkit/issues/1421
 FROM checker as builder
-RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,target=/home/worker/.gradle/caches/build-cache-1,gid=$gid,uid=$uid \
+    --mount=type=cache,target=/home/worker/.gradle/caches/8.5,gid=$gid,uid=$uid \
     --network=none \
     ./gradlew --offline build
 

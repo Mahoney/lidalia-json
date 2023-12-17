@@ -14,8 +14,6 @@ permissions:
   pull-requests: write
 
 env:
-  BUILDKIT_PROGRESS: plain
-  PROGRESS_NO_TRUNC: 1
   cache-name: docker-cache-17
 
 jobs:
@@ -65,7 +63,7 @@ jobs:
       - name: Archive output
         uses: actions/upload-artifact@v3
         with:
-          name: output
+          name: jars
           path: build/libs
 
       - name: Backup docker
