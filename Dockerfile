@@ -14,6 +14,7 @@ RUN --mount=type=bind,target=/docker-context \
     find . -name "*.gradle.kts" -exec cp --parents "{}" /gradle-files/ \; && \
     find . -name "libs.versions.toml" -exec cp --parents "{}" /gradle-files/ \; && \
     find . -name ".editorconfig" -exec cp --parents "{}" /gradle-files/ \; && \
+    find . -name "gradle.properties" -exec cp --parents "{}" /gradle-files/ \; && \
     find . -name "*module-info.java" -exec cp --parents "{}" /gradle-files/ \;
 
 
@@ -37,7 +38,6 @@ WORKDIR $work_dir
 # Download gradle in a separate step to benefit from layer caching
 COPY --link --chown=$username gradle/wrapper gradle/wrapper
 COPY --link --chown=$username gradlew gradlew
-COPY --link --chown=$username gradle.properties gradle.properties
 
 RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
@@ -50,6 +50,7 @@ ENV GRADLE_OPTS="\
 -Dorg.gradle.console=plain \
 "
 
+# Build the configuration cache & download all deps in a single layer
 COPY --link --chown=$username --from=gradle-files /gradle-files ./
 RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
@@ -69,8 +70,7 @@ ARG work_dir
 
 COPY --link --from=base_builder $work_dir/build .
 
-# The builder step is guaranteed not to fail, so that the worker output can be tagged and its
-# contents (build reports) extracted.
+# The builder step is guaranteed not to fail, so that the build output can be extracted.
 # You run this as:
 # `docker build . --target build-output --output build-output && docker build .`
 # to retrieve the build reports whether or not the previous line exited successfully.
@@ -80,9 +80,3 @@ RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
     --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
     --network=none \
     if [ -f build/failed ]; then ./gradlew --offline build; fi
-
-
-FROM scratch as jars
-ARG work_dir
-
-COPY --link --from=builder $work_dir/build/libs .

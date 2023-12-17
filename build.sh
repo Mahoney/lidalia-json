@@ -5,12 +5,12 @@ set -euo pipefail
 main() {
   export BUILDKIT_PROGRESS=plain
   export PROGRESS_NO_TRUNC=1
+
   docker build . \
     --target build-output \
     --output build
 
-  docker build . \
-    --output build/libs
+  docker build .
 }
 
 main "$@"
