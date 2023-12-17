@@ -1,6 +1,5 @@
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-import net.idlestate.gradle.duplicates.CheckDuplicateClassesTask
 import com.github.gundy.semver4j.model.Version
 
 plugins {
@@ -10,7 +9,6 @@ plugins {
   alias(libs.plugins.kotlinter)
   alias(libs.plugins.taskTree)
   alias(libs.plugins.versions)
-  alias(libs.plugins.duplicateClasses)
 }
 
 buildscript {
@@ -67,22 +65,6 @@ tasks {
     dependsOn("buildHealth")
     dependsOn("installKotlinterPrePushHook")
   }
-  checkForDuplicateClasses {
-    excludeConfigurations(
-      "projectHealth",
-      "projectHealthClasspath",
-      "projectHealthElements",
-      "testImplementationDependenciesMetadata",
-      "kotlinBuildToolsApiClasspath",
-    )
-  }
-}
-
-fun CheckDuplicateClassesTask.excludeConfigurations(vararg configurationNames: String) {
-  val configs = configurations.filterNot { it.name in configurationNames }
-  configurationsToCheck(
-    configs,
-  )
 }
 
 dependencyAnalysis {
