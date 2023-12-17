@@ -31,7 +31,6 @@ RUN --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
 
 ENV GRADLE_OPTS="\
 -Dorg.gradle.daemon=false \
--Dorg.gradle.logging.level=info \
 -Dorg.gradle.logging.stacktrace=all \
 -Dorg.gradle.vfs.watch=false \
 -Dorg.gradle.console=plain \
