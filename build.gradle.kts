@@ -2,7 +2,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gundy.semver4j.model.Version
 
 plugins {
-  kotlin("jvm") version "1.9.21"
+  alias(libs.plugins.kotlin)
 
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.kotlinter)
@@ -15,12 +15,11 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    "classpath"(group = "com.github.gundy", name = "semver4j", version = "0.16.4")
+    classpath(libs.semver4j)
   }
 }
 
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "uk.org.lidalia"
 
 repositories {
   mavenCentral()
