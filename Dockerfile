@@ -24,24 +24,24 @@ ARG username
 ARG work_dir
 ARG gid=1000
 ARG uid=1001
-ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
-ARG dot_gradle_dir=/home/$username/work/.gradle
 
 RUN addgroup --system $username --gid $gid && \
     adduser --system $username --ingroup $username --uid $uid
 
 USER $username
 RUN mkdir -p $work_dir
-RUN mkdir -p /home/$username/.gradle/caches
 WORKDIR $work_dir
 
 # Download gradle in a separate step to benefit from layer caching
 COPY --link --chown=$username gradle/wrapper gradle/wrapper
 COPY --link --chown=$username gradlew gradlew
 
-RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
-    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
-    ./gradlew --version
+RUN ./gradlew --version
+
+ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
+ARG dot_gradle_dir=/home/$username/work/.gradle
+
+RUN mkdir -p /home/$username/.gradle/caches
 
 ENV GRADLE_OPTS="\
 -Dorg.gradle.daemon=false \
