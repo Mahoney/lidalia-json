@@ -2,38 +2,18 @@
 kotlin = "1.9.21"
 
 [libraries]
-kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
-
 kotest-bom = { module = "io.kotest:kotest-bom", version = "5.8.0" }
-kotest-common = { module = "io.kotest:kotest-common" }
-kotest-extensions = { module = "io.kotest:kotest-extensions" }
-kotest-property = { module = "io.kotest:kotest-property" }
-kotest-assertions-api = { module = "io.kotest:kotest-assertions-api" }
-kotest-assertions-core = { module = "io.kotest:kotest-assertions-core" }
-kotest-assertions-json = { module = "io.kotest:kotest-assertions-json" }
 kotest-assertions-shared = { module = "io.kotest:kotest-assertions-shared" }
-kotest-assertions-sql = { module = "io.kotest:kotest-assertions-sql" }
-kotest-extensions-blockhound = { module = "io.kotest:kotest-extensions-blockhound" }
-kotest-extensions-htmlreporter = { module = "io.kotest:kotest-extensions-htmlreporter" }
-kotest-extensions-http = { module = "io.kotest:kotest-extensions-http" }
-kotest-extensions-junit5 = { module = "io.kotest:kotest-extensions-junit5" }
-kotest-extensions-junitxml = { module = "io.kotest:kotest-extensions-junitxml" }
-kotest-extensions-now = { module = "io.kotest:kotest-extensions-now" }
 kotest-framework-api = { module = "io.kotest:kotest-framework-api" }
-kotest-framework-concurrency = { module = "io.kotest:kotest-framework-concurrency" }
-kotest-framework-datatest = { module = "io.kotest:kotest-framework-datatest" }
-kotest-framework-discovery = { module = "io.kotest:kotest-framework-discovery" }
-kotest-framework-engine = { module = "io.kotest:kotest-framework-engine" }
-kotest-property-lifecycle = { module = "io.kotest:kotest-property-lifecycle" }
-kotest-runner-junit4 = { module = "io.kotest:kotest-runner-junit4" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5" }
 
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinter-gradle-plugin = { module = "org.jmailen.kotlinter:org.jmailen.kotlinter.gradle.plugin", version = "4.0.0" }
 
-reflections = { module = "org.reflections:reflections", version = "0.10.2" }
+semver4j = { module = "com.github.gundy:semver4j", version = "0.16.4" }
 
 [plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 dependencyAnalysis = { id = "com.autonomousapps.dependency-analysis", version = "1.28.0" }
 kotlinter = { id = "org.jmailen.kotlinter", version = "4.1.0" }
 taskTree = { id = "com.dorongold.task-tree", version = "2.1.1" }
