@@ -72,7 +72,7 @@ COPY --link --from=base_builder $work_dir/build .
 
 # The builder step is guaranteed not to fail, so that the build output can be extracted.
 # You run this as:
-# `docker build . --target build-output --output build-output && docker build .`
+# `docker build . --target build-output --output build && docker build .`
 # to retrieve the build reports whether or not the previous line exited successfully.
 # Workaround for https://github.com/moby/buildkit/issues/1421
 FROM base_builder as builder
