@@ -38,10 +38,9 @@ COPY --link --chown=$username gradlew gradlew
 
 RUN ./gradlew --version
 
-ARG gradle_cache_dir=/home/$username/.gradle/caches/build-cache-1
-ARG dot_gradle_dir=/home/$username/work/.gradle
+ARG gradle_cache_dir=/home/$username/.gradle/caches
 
-RUN mkdir -p /home/$username/.gradle/caches
+RUN mkdir -p $gradle_cache_dir/8.5
 
 ENV GRADLE_OPTS="\
 -Dorg.gradle.daemon=false \
@@ -52,15 +51,27 @@ ENV GRADLE_OPTS="\
 
 # Build the configuration cache & download all deps in a single layer
 COPY --link --chown=$username --from=gradle-files /gradle-files ./
-RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
-    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
-    ./gradlew build --dry-run
+RUN  --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/build-cache-1 \
+     ./gradlew build --dry-run
 
 COPY --link --chown=$username . .
 
 # So the tests can run without network access. Proves no tests rely on external services.
-RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
-    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
+RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/build-cache-1 \
     --network=none \
     ./gradlew --offline build || (mkdir -p build && touch build/failed)
 
@@ -76,7 +87,12 @@ COPY --link --from=base_builder $work_dir/build .
 # to retrieve the build reports whether or not the previous line exited successfully.
 # Workaround for https://github.com/moby/buildkit/issues/1421
 FROM base_builder as builder
-RUN --mount=type=cache,target=$dot_gradle_dir,gid=$gid,uid=$uid \
-    --mount=type=cache,target=$gradle_cache_dir,gid=$gid,uid=$uid \
-    --network=none \
+RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/build-cache-1 \
     if [ -f build/failed ]; then ./gradlew --offline build; fi
