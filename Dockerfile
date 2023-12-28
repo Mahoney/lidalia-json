@@ -18,7 +18,14 @@ RUN --mount=type=bind,target=/docker-context \
     find . -name "*module-info.java" -exec cp --parents "{}" /gradle-files/ \;
 
 
-FROM --platform=$BUILDPLATFORM eclipse-temurin:17.0.9_9-jdk-focal as base_builder
+FROM --platform=$BUILDPLATFORM alpine as base_builder
+
+RUN apk add --no-cache \
+    bash \
+    curl \
+    zip
+
+SHELL ["/bin/bash", "-c"]
 
 ARG username
 ARG work_dir
@@ -31,6 +38,11 @@ RUN addgroup --system $username --gid $gid && \
 USER $username
 RUN mkdir -p $work_dir
 WORKDIR $work_dir
+
+RUN curl -s "https://get.sdkman.io" | bash
+
+COPY --link .sdkmanrc .
+RUN source ~/.sdkman/bin/sdkman-init.sh && sdk env install && sdk env
 
 # Download gradle in a separate step to benefit from layer caching
 COPY --link --chown=$username gradle/wrapper gradle/wrapper
