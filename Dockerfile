@@ -42,7 +42,8 @@ WORKDIR $work_dir
 RUN curl -s "https://get.sdkman.io" | bash
 
 COPY --link .sdkmanrc .
-RUN source ~/.sdkman/bin/sdkman-init.sh && sdk env install && sdk env
+RUN source /home/$username/.sdkman/bin/sdkman-init.sh && sdk env install && sdk env
+ENV PATH=/home/$username/.sdkman/candidates/java/current/bin:$PATH
 
 # Download gradle in a separate step to benefit from layer caching
 COPY --link --chown=$username gradle/wrapper gradle/wrapper
