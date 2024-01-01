@@ -2,7 +2,7 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gundy.semver4j.model.Version
 
 plugins {
-  alias(libs.plugins.kotlin)
+  alias(libs.plugins.kotlin.jvm)
 
   alias(libs.plugins.dependencyAnalysis)
   alias(libs.plugins.kotlinter)
