@@ -33,8 +33,8 @@ RUN mkdir -p $work_dir
 WORKDIR $work_dir
 
 # Download gradle in a separate step to benefit from layer caching
-COPY --link --chown=$username gradle/wrapper gradle/wrapper
-COPY --link --chown=$username gradlew gradlew
+COPY --link --chown=$uid gradle/wrapper gradle/wrapper
+COPY --link --chown=$uid gradlew gradlew
 
 RUN ./gradlew --version
 
@@ -50,7 +50,7 @@ ENV GRADLE_OPTS="\
 "
 
 # Build the configuration cache & download all deps in a single layer
-COPY --link --chown=$username --from=gradle-files /gradle-files ./
+COPY --link --from=gradle-files /gradle-files ./
 RUN  --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
@@ -61,7 +61,7 @@ RUN  --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/build-cache-1 \
      ./gradlew build --dry-run
 
-COPY --link --chown=$username . .
+COPY --link --chown=$uid . .
 
 # So the tests can run without network access. Proves no tests rely on external services.
 RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
