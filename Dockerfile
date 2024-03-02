@@ -39,8 +39,9 @@ COPY --link --chown=$uid gradlew gradlew
 RUN ./gradlew --version
 
 ARG gradle_cache_dir=/home/$username/.gradle/caches
+ARG gradle_cache_dir_v=/home/$username/.gradle/caches/8.6
 
-RUN mkdir -p $gradle_cache_dir/8.5
+RUN mkdir -p $gradle_cache_dir_v
 
 ENV GRADLE_OPTS="\
 -Dorg.gradle.daemon=false \
@@ -52,9 +53,9 @@ ENV GRADLE_OPTS="\
 # Build the configuration cache & download all deps in a single layer
 COPY --link --from=gradle-files /gradle-files ./
 RUN  --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
-     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
-     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
-     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/generated-gradle-jars \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/kotlin-dsl \
+     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/scripts \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
@@ -65,9 +66,9 @@ COPY --link --chown=$uid . .
 
 # So the tests can run without network access. Proves no tests rely on external services.
 RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/generated-gradle-jars \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/kotlin-dsl \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/scripts \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
@@ -88,9 +89,9 @@ COPY --link --from=base_builder $work_dir/build .
 # Workaround for https://github.com/moby/buildkit/issues/1421
 FROM --platform=$BUILDPLATFORM base_builder as builder
 RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/generated-gradle-jars \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/kotlin-dsl \
-    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/8.5/scripts \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/generated-gradle-jars \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/kotlin-dsl \
+    --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/scripts \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/modules-2 \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/transforms-3 \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
