@@ -51,7 +51,7 @@ ENV GRADLE_OPTS="\
 "
 
 # Build the configuration cache & download all deps in a single layer
-COPY --link --from=gradle-files /gradle-files ./
+COPY --link --chown=$uid --from=gradle-files /gradle-files ./
 RUN  --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/generated-gradle-jars \
      --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir_v/kotlin-dsl \
