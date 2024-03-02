@@ -39,7 +39,7 @@ COPY --link --chown=$uid gradlew gradlew
 RUN ./gradlew --version
 
 ARG gradle_cache_dir=/home/$username/.gradle/caches
-ARG gradle_cache_dir_v=/home/$username/.gradle/caches/8.6
+ARG gradle_cache_dir_v=$gradle_cache_dir/8.6
 
 RUN mkdir -p $gradle_cache_dir_v
 
@@ -82,7 +82,7 @@ ARG work_dir
 
 COPY --link --from=base_builder $work_dir/build .
 
-# The builder step is guaranteed not to fail, so that the build output can be extracted.
+# The base_builder step is guaranteed not to fail, so that the build output can be extracted.
 # You run this as:
 # `docker build . --target build-output --output build && docker build .`
 # to retrieve the build reports whether or not the previous line exited successfully.
