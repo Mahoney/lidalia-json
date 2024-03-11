@@ -58,11 +58,12 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: build-reports
-          path: build/reports
+          name: build
+          path: build
 
       - name: Archive output
         uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: jars
           path: build/libs
