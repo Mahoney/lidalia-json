@@ -39,12 +39,10 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           target: build-output
-          outputs: 'type=cacheonly,type=local,dest=build'
+          outputs: 'type=local,dest=build'
 
       - uses: docker/build-push-action@v5
         if: ${{ hashFiles('build/failed') != '' }}
-        with:
-          outputs: 'type=cacheonly'
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
