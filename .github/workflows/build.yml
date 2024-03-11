@@ -7,7 +7,7 @@ on:
   schedule:
     # Daily at 2AM
     # * is a special character in YAML so you have to quote this string
-    - cron: '0 2 * * *'
+    - cron: '30 2 * * *'
 
 permissions:
   checks: write
@@ -42,6 +42,7 @@ jobs:
           outputs: 'type=cacheonly,type=local,dest=build'
 
       - uses: docker/build-push-action@v5
+        if: ${{ hashFiles('build/failed') != '' }}
         with:
           outputs: 'type=cacheonly'
 
