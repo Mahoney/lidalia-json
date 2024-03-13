@@ -25,8 +25,8 @@ jobs:
       - uses: docker/setup-buildx-action@v3
         with:
           version: "lab:latest"
-          driver: cloud
-          endpoint: "mahoney266/lidalia-world-gha"
+#          driver: cloud
+#          endpoint: "mahoney266/lidalia-world-gha"
           install: true
 
       - uses: docker/build-push-action@v5
