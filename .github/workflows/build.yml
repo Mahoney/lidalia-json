@@ -33,9 +33,12 @@ jobs:
         with:
           target: build-output
           outputs: 'type=local,dest=build'
+          provenance: false
 
       - uses: docker/build-push-action@v5
         if: ${{ hashFiles('build/failed') != '' }}
+        with:
+          provenance: false
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
