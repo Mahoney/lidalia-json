@@ -6,11 +6,13 @@ main() {
   export BUILDKIT_PROGRESS=plain
   export PROGRESS_NO_TRUNC=1
 
+  rm -rf build/failed
+
   docker build . \
     --target build-output \
     --output build
 
-  docker build .
+  if [ -f build/failed ]; then exit 1; fi
 }
 
 main "$@"
