@@ -74,7 +74,7 @@ RUN --mount=type=cache,gid=$gid,uid=$uid,target=$work_dir/.gradle \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/jars-9 \
     --mount=type=cache,gid=$gid,uid=$uid,target=$gradle_cache_dir/build-cache-1 \
     --network=none \
-    ./gradlew --offline build || (mkdir -p build && touch build/failed)
+    ./gradlew --offline build || (status=$?; mkdir -p build && echo $status > build/failed)
 
 
 FROM --platform=$BUILDPLATFORM scratch as build-output
