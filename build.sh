@@ -12,7 +12,7 @@ main() {
     --target build-output \
     --output build
 
-  if [ -f build/failed ]; then exit 1; fi
+  if [ -f build/failed ]; then exit "$(cat build/failed)"; fi
 }
 
 main "$@"
