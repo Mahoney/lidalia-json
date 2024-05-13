@@ -2,7 +2,7 @@
 kotlin = "1.9.23"
 
 [libraries]
-kotest-bom = { module = "io.kotest:kotest-bom", version = "5.8.1" }
+kotest-bom = { module = "io.kotest:kotest-bom", version = "5.9.0" }
 kotest-assertions-shared = { module = "io.kotest:kotest-assertions-shared" }
 kotest-framework-api = { module = "io.kotest:kotest-framework-api" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5" }
