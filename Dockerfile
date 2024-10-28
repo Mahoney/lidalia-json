@@ -18,7 +18,7 @@ RUN --mount=type=bind,target=/docker-context \
     find . -name "*module-info.java" -exec cp --parents "{}" /gradle-files/ \;
 
 
-FROM --platform=$BUILDPLATFORM eclipse-temurin:17.0.12_7-jdk-focal as base_builder
+FROM --platform=$BUILDPLATFORM eclipse-temurin:17.0.13_11-jdk-focal as base_builder
 
 ARG username
 ARG work_dir
